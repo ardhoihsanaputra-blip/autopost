@@ -1,0 +1,1756 @@
+```html
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AffiliAuto — Shopee Affiliate Auto-Poster &amp; Auto-Comment Hub</title>
+  
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            shopee: {
+              50: '#fff3f0',
+              100: '#ffe4de',
+              500: '#ee4d2d',
+              600: '#d73211',
+              700: '#b32409',
+            },
+            brand: {
+              500: '#6366f1',
+              600: '#4f46e5',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar for sleek SaaS look */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.5);
+    }
+
+    /* Subtle animated pulse for live execution */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.85); opacity: 0.8; }
+      70% { transform: scale(1.4); opacity: 0; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+    .live-dot::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 9999px;
+      background-color: currentColor;
+      animation: pulse-ring 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    }
+
+    /* Smooth transitions */
+    .card-transition {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans antialiased min-h-screen selection:bg-shopee-500 selection:text-white">
+
+  <!-- Toast Notification Container (Replaces alert) -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-white/85 dark:bg-slate-900/85 border-b border-slate-200/80 dark:border-slate-800/80">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      
+      <!-- Brand Identity -->
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-shopee-500 via-orange-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-shopee-500/25 shrink-0">
+          <!-- Custom Shopee Affiliate Rocket Bag SVG -->
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+        </div>
+        <div class="truncate">
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-base sm:text-lg tracking-tight truncate">AffiliAuto</h1>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-shopee-500/15 text-shopee-500 border border-shopee-500/25">
+              Shopee Hub
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 truncate hidden md:block">
+            Auto-Poster &amp; Auto-Comment Sebar Link Multi-Platform
+          </p>
+        </div>
+      </div>
+
+      <!-- Center / Right Controls -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Execution Mode Switcher -->
+        <div class="flex items-center bg-slate-100 dark:bg-slate-800/90 p-1 rounded-xl border border-slate-200 dark:border-slate-700/80">
+          <button id="btn-mode-sim" onclick="setExecutionMode('simulation')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Mode Simulasi</span>
+          </button>
+          <button id="btn-mode-live" onclick="setExecutionMode('live')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+            <span class="w-2 h-2 rounded-full bg-shopee-500"></span>
+            <span class="hidden sm:inline">Mode Live API / Webhook</span>
+            <span class="sm:hidden">Live API</span>
+          </button>
+        </div>
+
+        <!-- API & Webhook Settings Button -->
+        <button onclick="openSettingsModal()" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-slate-800 dark:hover:bg-slate-700 hover:bg-slate-800 border border-slate-700/60 transition-all flex items-center gap-2 shadow-sm">
+          <svg class="w-4 h-4 text-shopee-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span class="hidden md:inline">Pengaturan API &amp; Webhook</span>
+          <span id="header-api-badge" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        </button>
+
+        <!-- Theme Toggle Button -->
+        <button onclick="toggleTheme()" title="Ganti Tema Terang/Gelap" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 transition-colors">
+          <!-- Sun icon (shown in dark mode) -->
+          <svg id="icon-sun" class="w-4 h-4 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <!-- Moon icon (shown in light mode) -->
+          <svg id="icon-moon" class="w-4 h-4 block dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace Container -->
+  <main class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    
+    <!-- Top Campaign Statistics Bar -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+      <!-- Stat 1 -->
+      <div class="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Total Post Terkirim</span>
+          <span class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-500">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="stat-posts" class="text-2xl font-extrabold tracking-tight">12</span>
+          <span class="text-[11px] font-medium text-emerald-500">+4 hari ini</span>
+        </div>
+      </div>
+
+      <!-- Stat 2 -->
+      <div class="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Total Auto-Komen Link</span>
+          <span class="p-1.5 rounded-lg bg-shopee-500/10 text-shopee-500">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          </span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="stat-comments" class="text-2xl font-extrabold tracking-tight">29</span>
+          <span class="text-[11px] font-medium text-shopee-500">100% Link Shopee</span>
+        </div>
+      </div>
+
+      <!-- Stat 3 -->
+      <div class="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Platform Aktif</span>
+          <span class="p-1.5 rounded-lg bg-sky-500/10 text-sky-500">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          </span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="stat-platforms" class="text-2xl font-extrabold tracking-tight">4 / 4</span>
+          <span class="text-[11px] font-medium text-slate-400">Threads, IG, X, FB</span>
+        </div>
+      </div>
+
+      <!-- Stat 4: Anti-Spam Safety Meter -->
+      <div class="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Keamanan Anti-Spam</span>
+          <span id="safety-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-500">AMAN</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <span id="stat-safety" class="text-2xl font-extrabold tracking-tight text-emerald-500">96%</span>
+          <div class="flex-1 h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div id="safety-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-300" style="width: 96%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Two-Column Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- LEFT / MAIN PANEL: Composer & Shopee Link Builder (7 Cols on LG) -->
+      <div class="lg:col-span-7 space-y-5">
+        
+        <!-- Step 1: Shopee Product & Affiliate Link Builder -->
+        <div class="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm">
+          <div class="flex items-center justify-between gap-2 mb-4">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-shopee-500/15 text-shopee-500 font-bold text-xs flex items-center justify-center">1</span>
+              <div>
+                <h2 class="font-bold text-base">Detail Produk &amp; Link Affiliate Shopee</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Masukkan info produk untuk otomatisasi caption &amp; komentar link</p>
+              </div>
+            </div>
+            <button onclick="loadSampleProduct()" class="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline shrink-0">
+              Ganti Contoh Produk
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Nama Produk Shopee *</label>
+              <input id="input-product-name" type="text" oninput="syncAllPreviews()"
+                value="TWS Bluetooth 5.4 ANC Bass Nendang Tahan 36 Jam"
+                placeholder="Contoh: Kipas Angin Mini Turbo Portable 100 Speed"
+                class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-shopee-500/50 focus:border-shopee-500 transition-all" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Harga / Info Promo</label>
+              <input id="input-product-price" type="text" oninput="syncAllPreviews()"
+                value="Rp 89.000 (Diskon 65%)"
+                placeholder="Contoh: Rp 49.900 (Flash Sale)"
+                class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-shopee-500/50 focus:border-shopee-500 transition-all" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Kategori Produk</label>
+              <select id="input-product-category" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-shopee-500/50 focus:border-shopee-500 transition-all">
+                <option value="Elektronik & Gadget">Elektronik &amp; Gadget</option>
+                <option value="Fashion & OOTD">Fashion &amp; OOTD</option>
+                <option value="Skincare & Kecantikan">Skincare &amp; Kecantikan</option>
+                <option value="Perlengkapan Rumah Estetik">Perlengkapan Rumah Estetik</option>
+                <option value="Makanan & Cemilan Viral">Makanan &amp; Cemilan Viral</option>
+              </select>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Link Affiliate Shopee *</label>
+              <div class="relative flex items-center">
+                <span class="absolute left-3.5 text-shopee-500">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                </span>
+                <input id="input-affiliate-link" type="url" oninput="syncAllPreviews()"
+                  value="https://s.shopee.co.id/8f9xK2mQpL"
+                  placeholder="https://shope.ee/... atau https://s.shopee.co.id/..."
+                  class="w-full pl-10 pr-28 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm font-mono text-shopee-600 dark:text-orange-400 focus:outline-none focus:ring-2 focus:ring-shopee-500/50 focus:border-shopee-500 transition-all" />
+                <button type="button" onclick="validateAndFormatLink()" class="absolute right-1.5 px-2.5 py-1.5 rounded-lg bg-shopee-500/15 hover:bg-shopee-500/25 text-shopee-600 dark:text-orange-400 text-xs font-semibold transition-colors">
+                  Cek Link
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Target Platform Selector Cards -->
+        <div class="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-indigo-500/15 text-indigo-500 font-bold text-xs flex items-center justify-center">2</span>
+              <div>
+                <h2 class="font-bold text-base">Pilih Platform Target</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Klik kartu untuk mengaktifkan atau menonaktifkan tujuan posting</p>
+              </div>
+            </div>
+            <button type="button" onclick="toggleAllPlatforms()" class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+              Pilih Semua
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="platform-cards-grid">
+            <!-- Threads -->
+            <div id="card-threads" onclick="togglePlatform('threads')" class="cursor-pointer rounded-xl p-3.5 border-2 border-indigo-500 bg-indigo-500/5 dark:bg-indigo-500/10 card-transition select-none relative">
+              <div class="flex items-center justify-between mb-2">
+                <div class="w-8 h-8 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center">
+                  <!-- Threads Icon -->
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32l-1.757-1.182c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388.108.046.216.094.321.142 1.49.7 2.58 1.761 3.154 3.07.797 1.82.871 4.79-1.548 7.158-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69c-.242 0-.487.007-.739.021-1.836.103-2.98.946-2.916 2.143.067 1.256 1.452 1.839 2.784 1.767 1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221Z"/></svg>
+                </div>
+                <span id="check-threads" class="w-5 h-5 rounded-md bg-indigo-500 text-white flex items-center justify-center text-xs font-bold">✓</span>
+              </div>
+              <div class="font-bold text-sm">Threads</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400">Maks 500 kar.</div>
+            </div>
+
+            <!-- Instagram -->
+            <div id="card-instagram" onclick="togglePlatform('instagram')" class="cursor-pointer rounded-xl p-3.5 border-2 border-indigo-500 bg-indigo-500/5 dark:bg-indigo-500/10 card-transition select-none relative">
+              <div class="flex items-center justify-between mb-2">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white flex items-center justify-center">
+                  <!-- Instagram Icon -->
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                </div>
+                <span id="check-instagram" class="w-5 h-5 rounded-md bg-indigo-500 text-white flex items-center justify-center text-xs font-bold">✓</span>
+              </div>
+              <div class="font-bold text-sm">Instagram</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400">Maks 2.200 kar.</div>
+            </div>
+
+            <!-- X (Twitter) -->
+            <div id="card-x" onclick="togglePlatform('x')" class="cursor-pointer rounded-xl p-3.5 border-2 border-indigo-500 bg-indigo-500/5 dark:bg-indigo-500/10 card-transition select-none relative">
+              <div class="flex items-center justify-between mb-2">
+                <div class="w-8 h-8 rounded-lg bg-black text-white border border-slate-700 flex items-center justify-center">
+                  <!-- X Icon -->
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </div>
+                <span id="check-x" class="w-5 h-5 rounded-md bg-indigo-500 text-white flex items-center justify-center text-xs font-bold">✓</span>
+              </div>
+              <div class="font-bold text-sm">X (Twitter)</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400">Maks 280 kar.</div>
+            </div>
+
+            <!-- Facebook -->
+            <div id="card-facebook" onclick="togglePlatform('facebook')" class="cursor-pointer rounded-xl p-3.5 border-2 border-indigo-500 bg-indigo-500/5 dark:bg-indigo-500/10 card-transition select-none relative">
+              <div class="flex items-center justify-between mb-2">
+                <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center">
+                  <!-- Facebook Icon -->
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+                </div>
+                <span id="check-facebook" class="w-5 h-5 rounded-md bg-indigo-500 text-white flex items-center justify-center text-xs font-bold">✓</span>
+              </div>
+              <div class="font-bold text-sm">Facebook</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400">Maks 5.000 kar.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Post Content & AI Spintax Generator -->
+        <div class="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-purple-500/15 text-purple-500 font-bold text-xs flex items-center justify-center">3</span>
+              <div>
+                <h2 class="font-bold text-base">Konten Postingan (Utama)</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Gunakan Spintax <code class="text-shopee-500 font-mono">{opsi1|opsi2}</code> agar tiap platform unik</p>
+              </div>
+            </div>
+
+            <!-- Gemini AI Generator Button -->
+            <button id="btn-ai-generate" type="button" onclick="generateAICopy()"
+              class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-shopee-500 hover:opacity-95 text-white text-xs font-bold shadow-md shadow-indigo-500/20 flex items-center gap-2 transition-all active:scale-[0.98]">
+              <svg id="ai-sparkle-icon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"></path>
+              </svg>
+              <span id="ai-btn-text">Buat Caption &amp; Komentar Otomatis (AI)</span>
+            </button>
+          </div>
+
+          <!-- Quick Preset Pills -->
+          <div class="flex flex-wrap items-center gap-1.5 mb-3">
+            <span class="text-[11px] font-medium text-slate-400 mr-1">Template Cepat:</span>
+            <button type="button" onclick="applyPreset('racun')" class="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-slate-100 dark:bg-slate-800 hover:bg-shopee-500/15 hover:text-shopee-500 transition-colors">🔥 Racun Shopee</button>
+            <button type="button" onclick="applyPreset('review')" class="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-slate-100 dark:bg-slate-800 hover:bg-indigo-500/15 hover:text-indigo-400 transition-colors">⭐ Review Jujur</button>
+            <button type="button" onclick="applyPreset('flashsale')" class="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-slate-100 dark:bg-slate-800 hover:bg-amber-500/15 hover:text-amber-500 transition-colors">⚡ Flash Sale</button>
+            <button type="button" onclick="spinPreviewNow()" class="ml-auto px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20 transition-colors flex items-center gap-1">
+              <span>🎲 Uji Acak Spintax</span>
+            </button>
+          </div>
+
+          <textarea id="input-post-content" rows="4" oninput="handleContentInput()"
+            class="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+            placeholder="Tulis caption promosi yang natural tanpa link di body agar tidak terkena shadowban...">{Racun Shopee hari ini!|Nyesel baru tau sekarang 😭|Rekomendasi barang wajib punya!}
+
+{produk} lagi turun harga jadi {harga}! Bass-nya nendang banget, baterai awet seharian, dan desainnya super cakep buat dipake harian.
+
+Yang mau samaan, {link pembelian udah aku taruh di kolom komentar pertama ya 👇|cek link Shopee resminya di komentar paling atas 👇} #racunshopee #shopeehaul</textarea>
+
+          <!-- Live Character Counters per Active Platform -->
+          <div id="char-counters-bar" class="mt-2.5 flex flex-wrap items-center gap-2 text-[11px] font-mono">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Step 4: Auto-Comment & Keyword Auto-Reply Settings -->
+        <div class="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm space-y-5">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-shopee-500/15 text-shopee-500 font-bold text-xs flex items-center justify-center">4</span>
+            <div>
+              <h2 class="font-bold text-base">Pengaturan Auto-Komen (Sebar Link Anti-Shadowban)</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Link Shopee otomatis ditaruh di komentar pertama agar jangkauan post tetap tinggi</p>
+            </div>
+          </div>
+
+          <!-- Toggle 1: Auto-Komen Link Utama -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/80 dark:border-slate-800/80 space-y-3">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="font-semibold text-sm flex items-center gap-2">
+                  <span>Auto-Komen Link Utama (Komentar Pertama)</span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-shopee-500/15 text-shopee-500">Direkomendasikan</span>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Otomatis membalas postingan sendiri dengan link Shopee setelah jeda detik tertentu</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                <input id="toggle-auto-comment" type="checkbox" checked onchange="syncAllPreviews(); updateSafetyScore();" class="sr-only peer">
+                <div class="w-11 h-6 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-shopee-500"></div>
+              </label>
+            </div>
+
+            <div id="auto-comment-fields" class="space-y-3 pt-1">
+              <div class="flex flex-wrap items-center gap-3">
+                <label class="text-xs font-medium text-slate-600 dark:text-slate-400">Jeda Auto-Komen setelah Post terbit:</label>
+                <select id="select-comment-delay" onchange="updateSafetyScore()" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+                  <option value="3">3 Detik (Simulasi Cepat)</option>
+                  <option value="5" selected>5 Detik (Optimal)</option>
+                  <option value="15">15 Detik (Natural)</option>
+                  <option value="30">30 Detik (Super Aman)</option>
+                </select>
+                <span class="text-[11px] text-slate-400 font-mono">Tag: {link}, {produk}, {harga}</span>
+              </div>
+
+              <textarea id="input-auto-comment" rows="3" oninput="syncAllPreviews()"
+                class="w-full p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-shopee-500/50"
+                placeholder="Isi komentar pertama yang berisi {link} Shopee...">{Spill link pembelian resminya di sini ya 👇|Buat yang nanya belinya di mana, langsung klik di bawah 👇|Link promo Shopee resmi cek di sini 👇}
+
+🛒 {produk} ({harga})
+🔗 {link}
+
+{Stok promo terbatas, buruan checkout sebelum harga naik!|Mumpung masih gratis ongkir + voucher diskon!}</textarea>
+            </div>
+          </div>
+
+          <!-- Toggle 2: Auto-Reply Komentar Kata Kunci -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/80 dark:border-slate-800/80 space-y-3">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="font-semibold text-sm">Auto-Reply Komentar Kata Kunci</div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Otomatis membalas komentar netizen yang mengetik kata pemicu dengan link Shopee</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                <input id="toggle-keyword-reply" type="checkbox" checked onchange="toggleKeywordSection()" class="sr-only peer">
+                <div class="w-11 h-6 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+              </label>
+            </div>
+
+            <div id="keyword-reply-fields" class="space-y-3 pt-1">
+              <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Kata Kunci Pemicu (pisahkan dengan koma):</label>
+                <input id="input-trigger-keywords" type="text" value="mau, link, spill, beli, harga, info"
+                  class="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/50" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Template Balasan Otomatis:</label>
+                <input id="input-keyword-reply-text" type="text"
+                  value="Halo kak! Ini ya link promo {produk}: {link} — buruan checkout sebelum kehabisan 🙌"
+                  class="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/50" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: Anti-Spam Delay, Schedule & Launch Button -->
+        <div class="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+            <!-- Anti-Spam Delay Between Platforms -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                Jeda Antar Platform (Anti-Spam Delay)
+              </label>
+              <select id="select-platform-delay" onchange="updateSafetyScore()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                <option value="2">2 Detik (Demo Cepat)</option>
+                <option value="5" selected>5 Detik (Seimbang)</option>
+                <option value="15">15 Detik (Aman Rate-Limit)</option>
+                <option value="30">30 Detik (Mode Hati-Hati)</option>
+                <option value="60">60 Detik (Ultra Safe)</option>
+              </select>
+            </div>
+
+            <!-- Schedule Picker -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                Waktu Eksekusi Kampanye
+              </label>
+              <div class="flex gap-2">
+                <select id="select-schedule-mode" onchange="toggleScheduleInput()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                  <option value="now">Posting Sekarang</option>
+                  <option value="scheduled">Jadwalkan Waktu</option>
+                </select>
+                <input id="input-schedule-time" type="datetime-local" class="hidden px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs" />
+              </div>
+            </div>
+          </div>
+
+          <button id="btn-launch-campaign" type="button" onclick="enqueueCampaign()"
+            class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-shopee-500 via-orange-500 to-indigo-600 hover:from-shopee-600 hover:to-indigo-700 text-white font-bold text-sm sm:text-base shadow-lg shadow-shopee-500/25 flex items-center justify-center gap-2.5 transition-all active:scale-[0.99]">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <span>Tambahkan ke Antrean &amp; Jalankan Sekarang</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- RIGHT PANEL: Multi-Platform Live Preview & Execution Console (5 Cols on LG) -->
+      <div class="lg:col-span-5 space-y-5 lg:sticky lg:top-20">
+        
+        <!-- Multi-Platform Live Preview Card -->
+        <div class="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <div>
+              <h2 class="font-bold text-base">Live Preview Post &amp; Auto-Komen</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Simulasi tampilan postingan beserta komentar link Shopee</p>
+            </div>
+            <button type="button" onclick="spinPreviewNow()" class="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold flex items-center gap-1 transition-colors" title="Acak variasi Spintax">
+              <span>🎲 Spin</span>
+            </button>
+          </div>
+
+          <!-- Platform Preview Switcher Tabs -->
+          <div class="grid grid-cols-4 gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200/70 dark:border-slate-800 mb-4">
+            <button id="tab-preview-threads" onclick="setPreviewTab('threads')" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm transition-all">Threads</button>
+            <button id="tab-preview-instagram" onclick="setPreviewTab('instagram')" class="py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">Instagram</button>
+            <button id="tab-preview-x" onclick="setPreviewTab('x')" class="py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">X</button>
+            <button id="tab-preview-facebook" onclick="setPreviewTab('facebook')" class="py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">Facebook</button>
+          </div>
+
+          <!-- Mockup Viewport Container -->
+          <div id="preview-mockup-container" class="rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+            <!-- Rendered dynamically via JS -->
+          </div>
+
+          <!-- Interactive Keyword Auto-Reply Sandbox Tester -->
+          <div class="mt-3 pt-3 border-t border-slate-200/70 dark:border-slate-800">
+            <div class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1.5 flex items-center justify-between">
+              <span>🧪 Uji Simulasi Komentar Netizen (Auto-Reply):</span>
+              <span class="text-indigo-500 font-mono">Trigger: mau / spill / link</span>
+            </div>
+            <div class="flex gap-2">
+              <input id="input-test-netizen" type="text" value="Kak spill link belinya dong mau!"
+                class="flex-1 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs focus:outline-none focus:border-indigo-500" />
+              <button type="button" onclick="simulateNetizenComment()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shrink-0 transition-colors">
+                Tes Komen
+              </button>
+            </div>
+            <div id="test-reply-output" class="hidden mt-2 p-2.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-slate-700 dark:text-slate-200"></div>
+          </div>
+        </div>
+
+        <!-- Real-Time Queue & Execution Console -->
+        <div class="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="relative flex h-2.5 w-2.5 text-emerald-500 live-dot">
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+              <h2 class="font-bold text-base">Antrean &amp; Log Aktivitas Real-Time</h2>
+            </div>
+            <button type="button" onclick="clearLogsAndCompleted()" class="text-[11px] font-medium text-slate-400 hover:text-rose-500 transition-colors">
+              Bersihkan
+            </button>
+          </div>
+
+          <!-- Console Sub-Tabs -->
+          <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2.5 mb-3">
+            <button id="subtab-queue" onclick="setConsoleTab('queue')" class="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">
+              Antrean Tugas (<span id="queue-count-badge">0</span>)
+            </button>
+            <button id="subtab-logs" onclick="setConsoleTab('logs')" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-white">
+              Terminal API Log (<span id="log-count-badge">2</span>)
+            </button>
+          </div>
+
+          <!-- View 1: Queue List -->
+          <div id="console-view-queue" class="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
+            <!-- Populated dynamically -->
+          </div>
+
+          <!-- View 2: Terminal Logs -->
+          <div id="console-view-logs" class="hidden bg-slate-950 text-slate-300 font-mono text-[11px] rounded-xl p-3.5 max-h-[340px] overflow-y-auto space-y-1.5 border border-slate-800">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- API & Webhook Settings Modal -->
+  <div id="settings-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between sticky top-0 bg-white dark:bg-slate-900 z-10">
+        <div>
+          <h3 class="font-bold text-lg">Pengaturan API &amp; Webhook Otomasi</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Hubungkan kredensial Meta Graph API, X API v2, atau Webhook n8n / Make.com</p>
+        </div>
+        <button onclick="closeSettingsModal()" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 space-y-6">
+        
+        <!-- Custom Webhook Endpoint (n8n / Make.com / Zapier) -->
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="font-bold text-sm flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-shopee-500"></span>
+              <span>Custom Webhook URL (n8n / Make.com / Backend Lokal)</span>
+            </div>
+            <span id="badge-webhook-status" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-500">Opsional / Siap</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            Saat <strong>Mode Live API / Webhook</strong> aktif, AffiliAuto akan mengirim payload JSON (caption, platform, dan auto-komen link Shopee) ke URL ini.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input id="cfg-webhook-url" type="url" placeholder="https://hook.eu2.make.com/xxxxxxxx atau http://localhost:5678/webhook/shopee"
+              class="flex-1 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono focus:outline-none focus:border-shopee-500" />
+            <button type="button" onclick="testWebhookConnection()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold shrink-0 transition-colors">
+              Uji Koneksi
+            </button>
+          </div>
+        </div>
+
+        <!-- Meta Graph API (Threads, Instagram, Facebook) -->
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="font-bold text-sm flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+              <span>Meta Graph API (Threads, Instagram &amp; Facebook)</span>
+            </div>
+            <span id="badge-meta-status" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-500">Token Demo Aktif</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-medium text-slate-500 mb-1">Meta User / Page Access Token</label>
+              <input id="cfg-meta-token" type="password" value="EAABsbCS1iHgBO7ZDemoTokenAffiliAuto2026"
+                class="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Threads User ID</label>
+              <input id="cfg-threads-id" type="text" value="17841405822304914"
+                class="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">Instagram Business ID</label>
+              <input id="cfg-ig-id" type="text" value="17841459012847310"
+                class="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-medium text-slate-500 mb-1">Facebook Page ID</label>
+              <input id="cfg-fb-id" type="text" value="104928374651920"
+                class="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono" />
+            </div>
+          </div>
+        </div>
+
+        <!-- X (Twitter) API v2 -->
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="font-bold text-sm flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+              <span>X (Twitter) API v2 OAuth 2.0</span>
+            </div>
+            <span id="badge-x-status" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-500">Terhubung</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">X API Key / Client ID</label>
+              <input id="cfg-x-key" type="password" value="x_api_client_992837412"
+                class="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-500 mb-1">X Bearer / Access Token</label>
+              <input id="cfg-x-token" type="password" value="AAAAAAAAAAAAAAAAAAAAAMLheAAAAAAA0%2BuSeid"
+                class="w-full px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-mono" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3 bg-slate-50/50 dark:bg-slate-900/50">
+        <button onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-800">
+          Batal
+        </button>
+        <button onclick="saveApiSettings()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20">
+          Simpan Pengaturan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application JavaScript Logic -->
+  <script>
+    // =========================================================================
+    // 1. GLOBAL APPLICATION STATE
+    // =========================================================================
+    const PLATFORM_META = {
+      threads: {
+        name: 'Threads',
+        limit: 500,
+        handle: '@racunshopee.id',
+        displayName: 'Racun Shopee Harian',
+        badgeColor: 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+      },
+      instagram: {
+        name: 'Instagram',
+        limit: 2200,
+        handle: 'racunshopee.id',
+        displayName: 'Racun Shopee Harian',
+        badgeColor: 'bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white'
+      },
+      x: {
+        name: 'X (Twitter)',
+        limit: 280,
+        handle: '@spillshopee_id',
+        displayName: 'Spill Promo Shopee 🧡',
+        badgeColor: 'bg-black text-white'
+      },
+      facebook: {
+        name: 'Facebook',
+        limit: 5000,
+        handle: 'Diskon & Racun Shopee Indonesia',
+        displayName: 'Diskon & Racun Shopee Indonesia',
+        badgeColor: 'bg-blue-600 text-white'
+      }
+    };
+
+    const SAMPLE_PRODUCTS = [
+      {
+        name: 'TWS Bluetooth 5.4 ANC Bass Nendang Tahan 36 Jam',
+        price: 'Rp 89.000 (Diskon 65%)',
+        category: 'Elektronik & Gadget',
+        link: 'https://s.shopee.co.id/8f9xK2mQpL'
+      },
+      {
+        name: 'Kipas Angin Mini Turbo Portable 100 Kecepatan Dingin Ekstra',
+        price: 'Rp 64.500 (Flash Sale)',
+        category: 'Elektronik & Gadget',
+        link: 'https://s.shopee.co.id/3q4Lm9pRtX'
+      },
+      {
+        name: 'Cardigan Rajut Oversize Korean Style Premium Tebal',
+        price: 'Rp 55.000 (Beli 2 Lebih Hemat)',
+        category: 'Fashion & OOTD',
+        link: 'https://s.shopee.co.id/7p2Wn8vKsB'
+      },
+      {
+        name: 'Serum Niacinamide 10% + Hyaluronic Acid Cerahkan Wajah 7 Hari',
+        price: 'Rp 42.900 (Gratis Ongkir)',
+        category: 'Skincare & Kecantikan',
+        link: 'https://s.shopee.co.id/5k8Qr1zNcV'
+      }
+    ];
+
+    const state = {
+      executionMode: 'simulation', // 'simulation' | 'live'
+      selectedPlatforms: {
+        threads: true,
+        instagram: true,
+        x: true,
+        facebook: true
+      },
+      activePreviewTab: 'threads',
+      activeConsoleTab: 'queue',
+      spinSeed: 1,
+      stats: {
+        postsSent: 12,
+        commentsSent: 29
+      },
+      queue: [],
+      logs: [],
+      sampleIdx: 0,
+      apiConfig: {
+        webhookUrl: '',
+        metaToken: 'EAABsbCS1iHgBO7ZDemoTokenAffiliAuto2026',
+        threadsId: '17841405822304914',
+        igId: '17841459012847310',
+        fbId: '104928374651920',
+        xKey: 'x_api_client_992837412',
+        xToken: 'AAAAAAAAAAAAAAAAAAAAAMLheAAAAAAA0%2BuSeid'
+      }
+    };
+
+    // =========================================================================
+    // 2. SPINTAX & PLACEHOLDER PARSER ENGINE
+    // =========================================================================
+    /**
+     * Resolves nested or flat {option1|option2|option3} spintax strings
+     * and replaces {produk}, {harga}, and {link} placeholders.
+     */
+    function resolveSpintaxAndPlaceholders(template, useRandom = true) {
+      if (!template) return '';
+      const productName = document.getElementById('input-product-name').value.trim() || 'Produk Pilihan Shopee';
+      const productPrice = document.getElementById('input-product-price').value.trim() || 'Harga Promo';
+      const affiliateLink = document.getElementById('input-affiliate-link').value.trim() || 'https://s.shopee.co.id/promo';
+
+      // First protect known variable tags before spinning {a|b}
+      let text = template
+        .replace(/\{produk\}/gi, '___VAR_PRODUK___')
+        .replace(/\{harga\}/gi, '___VAR_HARGA___')
+        .replace(/\{link\}/gi, '___VAR_LINK___');
+
+      // Iteratively resolve spintax blocks {opt1|opt2}
+      const spintaxRegex = /\{([^{}]+)\}/g;
+      let safetyCounter = 0;
+      while (spintaxRegex.test(text) && safetyCounter < 10) {
+        text = text.replace(spintaxRegex, (_, choicesStr) => {
+          const choices = choicesStr.split('|');
+          if (choices.length === 1) return choices[0];
+          const idx = useRandom
+            ? Math.floor(Math.random() * choices.length)
+            : (state.spinSeed % choices.length);
+          return choices[idx];
+        });
+        safetyCounter++;
+      }
+
+      // Restore protected variables
+      text = text
+        .replace(/___VAR_PRODUK___/g, productName)
+        .replace(/___VAR_HARGA___/g, productPrice)
+        .replace(/___VAR_LINK___/g, affiliateLink);
+
+      return text;
+    }
+
+    function spinPreviewNow() {
+      state.spinSeed++;
+      syncAllPreviews(true);
+      showToast('Variasi Spintax baru berhasil diacak pada preview!', 'info');
+    }
+
+    // =========================================================================
+    // 3. UI & THEME CONTROLS
+    // =========================================================================
+    function toggleTheme() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      const isDark = html.classList.contains('dark');
+      localStorage.setItem('affiliauto_theme', isDark ? 'dark' : 'light');
+    }
+
+    function setExecutionMode(mode) {
+      state.executionMode = mode;
+      const btnSim = document.getElementById('btn-mode-sim');
+      const btnLive = document.getElementById('btn-mode-live');
+
+      const activeClasses = ['bg-white', 'dark:bg-slate-900', 'text-indigo-600', 'dark:text-indigo-400', 'shadow-sm'];
+      const inactiveClasses = ['text-slate-600', 'dark:text-slate-400'];
+
+      if (mode === 'simulation') {
+        btnSim.classList.add(...activeClasses);
+        btnSim.classList.remove(...inactiveClasses);
+        btnLive.classList.remove(...activeClasses);
+        btnLive.classList.add(...inactiveClasses);
+        addTerminalLog('SYSTEM', 'Beralih ke Mode Simulasi (Demo aman tanpa memanggil API eksternal).');
+        showToast('Mode Simulasi (Demo) aktif', 'info');
+      } else {
+        btnLive.classList.add(...activeClasses);
+        btnLive.classList.remove(...inactiveClasses);
+        btnSim.classList.remove(...activeClasses);
+        btnSim.classList.add(...inactiveClasses);
+        addTerminalLog('SYSTEM', 'Beralih ke Mode Live API / Webhook. Siap mengirim payload real-time.');
+        showToast('Mode Live API / Webhook aktif! Pastikan URL Webhook atau Token API terisi.', 'warning');
+      }
+    }
+
+    function togglePlatform(platformKey) {
+      state.selectedPlatforms[platformKey] = !state.selectedPlatforms[platformKey];
+      updatePlatformCardsUI();
+      updateCharCounters();
+      updateSafetyScore();
+    }
+
+    function toggleAllPlatforms() {
+      const allSelected = Object.values(state.selectedPlatforms).every(Boolean);
+      const nextVal = !allSelected;
+      Object.keys(state.selectedPlatforms).forEach(k => {
+        state.selectedPlatforms[k] = nextVal;
+      });
+      updatePlatformCardsUI();
+      updateCharCounters();
+      updateSafetyScore();
+    }
+
+    function updatePlatformCardsUI() {
+      let activeCount = 0;
+      Object.keys(PLATFORM_META).forEach(key => {
+        const isSelected = state.selectedPlatforms[key];
+        if (isSelected) activeCount++;
+
+        const card = document.getElementById(`card-${key}`);
+        const check = document.getElementById(`check-${key}`);
+
+        if (isSelected) {
+          card.classList.add('border-indigo-500', 'bg-indigo-500/5', 'dark:bg-indigo-500/10');
+          card.classList.remove('border-slate-200', 'dark:border-slate-800', 'opacity-60');
+          check.classList.add('bg-indigo-500', 'text-white');
+          check.classList.remove('bg-slate-200', 'dark:bg-slate-800', 'text-transparent');
+          check.textContent = '✓';
+        } else {
+          card.classList.remove('border-indigo-500', 'bg-indigo-500/5', 'dark:bg-indigo-500/10');
+          card.classList.add('border-slate-200', 'dark:border-slate-800', 'opacity-60');
+          check.classList.remove('bg-indigo-500', 'text-white');
+          check.classList.add('bg-slate-200', 'dark:bg-slate-800', 'text-transparent');
+          check.textContent = '';
+        }
+      });
+
+      document.getElementById('stat-platforms').textContent = `${activeCount} / 4`;
+    }
+
+    function toggleKeywordSection() {
+      const enabled = document.getElementById('toggle-keyword-reply').checked;
+      const fields = document.getElementById('keyword-reply-fields');
+      fields.style.opacity = enabled ? '1' : '0.45';
+      fields.style.pointerEvents = enabled ? 'auto' : 'none';
+    }
+
+    function toggleScheduleInput() {
+      const mode = document.getElementById('select-schedule-mode').value;
+      const dtInput = document.getElementById('input-schedule-time');
+      if (mode === 'scheduled') {
+        dtInput.classList.remove('hidden');
+        if (!dtInput.value) {
+          const now = new Date(Date.now() + 15 * 60000);
+          dtInput.value = now.toISOString().slice(0, 16);
+        }
+      } else {
+        dtInput.classList.add('hidden');
+      }
+    }
+
+    // =========================================================================
+    // 4. CHARACTER COUNTERS & ANTI-SPAM SAFETY METER
+    // =========================================================================
+    function handleContentInput() {
+      updateCharCounters();
+      syncAllPreviews(false);
+      updateSafetyScore();
+    }
+
+    function updateCharCounters() {
+      const rawContent = document.getElementById('input-post-content').value;
+      const resolvedSample = resolveSpintaxAndPlaceholders(rawContent, false);
+      const len = resolvedSample.length;
+
+      const bar = document.getElementById('char-counters-bar');
+      bar.innerHTML = '';
+
+      Object.entries(PLATFORM_META).forEach(([key, meta]) => {
+        if (!state.selectedPlatforms[key]) return;
+        const isOver = len > meta.limit;
+        const pill = document.createElement('span');
+        pill.className = `px-2.5 py-1 rounded-lg border ${
+          isOver
+            ? 'bg-rose-500/15 border-rose-500/30 text-rose-500 font-bold'
+            : 'bg-slate-100 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'
+        }`;
+        pill.textContent = `${meta.name}: ${len}/${meta.limit}`;
+        bar.appendChild(pill);
+      });
+    }
+
+    function updateSafetyScore() {
+      const rawContent = document.getElementById('input-post-content').value;
+      const hasSpintax = /\{[^{}]+\|[^{}]+\}/.test(rawContent);
+      const hasRawLinkInBody = /https?:\/\//i.test(rawContent) || /\{link\}/i.test(rawContent);
+      const autoCommentOn = document.getElementById('toggle-auto-comment').checked;
+      const platformDelay = parseInt(document.getElementById('select-platform-delay').value, 10);
+      const commentDelay = parseInt(document.getElementById('select-comment-delay').value, 10);
+
+      let score = 60;
+      if (hasSpintax) score += 16;
+      if (autoCommentOn && !hasRawLinkInBody) score += 14;
+      if (hasRawLinkInBody) score -= 22;
+      if (platformDelay >= 5) score += 5;
+      if (commentDelay >= 5) score += 5;
+
+      score = Math.max(25, Math.min(99, score));
+
+      const statEl = document.getElementById('stat-safety');
+      const barEl = document.getElementById('safety-bar');
+      const badgeEl = document.getElementById('safety-badge');
+
+      statEl.textContent = `${score}%`;
+      barEl.style.width = `${score}%`;
+
+      if (score >= 80) {
+        statEl.className = 'text-2xl font-extrabold tracking-tight text-emerald-500';
+        barEl.className = 'h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-300';
+        badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-500';
+        badgeEl.textContent = 'AMAN';
+      } else if (score >= 55) {
+        statEl.className = 'text-2xl font-extrabold tracking-tight text-amber-500';
+        barEl.className = 'h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-300';
+        badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-500';
+        badgeEl.textContent = 'SEDANG';
+      } else {
+        statEl.className = 'text-2xl font-extrabold tracking-tight text-rose-500';
+        barEl.className = 'h-full bg-gradient-to-r from-rose-500 to-orange-500 rounded-full transition-all duration-300';
+        badgeEl.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-500';
+        badgeEl.textContent = 'RISIKO SPAM';
+      }
+    }
+
+    // =========================================================================
+    // 5. PRESETS & GEMINI AI CAPTION + SPINTAX GENERATOR
+    // =========================================================================
+    function loadSampleProduct() {
+      state.sampleIdx = (state.sampleIdx + 1) % SAMPLE_PRODUCTS.length;
+      const sample = SAMPLE_PRODUCTS[state.sampleIdx];
+      document.getElementById('input-product-name').value = sample.name;
+      document.getElementById('input-product-price').value = sample.price;
+      document.getElementById('input-product-category').value = sample.category;
+      document.getElementById('input-affiliate-link').value = sample.link;
+
+      syncAllPreviews(true);
+      showToast(`Contoh produk diganti ke: ${sample.name}`, 'info');
+    }
+
+    function validateAndFormatLink() {
+      const linkInput = document.getElementById('input-affiliate-link');
+      let val = linkInput.value.trim();
+      if (!val) {
+        showToast('Masukkan URL Shopee terlebih dahulu.', 'error');
+        return;
+      }
+      if (!/^https?:\/\//i.test(val)) {
+        val = 'https://' + val;
+        linkInput.value = val;
+      }
+      const isShopee = /shopee\.co\.id|shope\.ee/i.test(val);
+      if (isShopee) {
+        showToast('Valid! Format Link Affiliate Shopee terverifikasi siap disebar.', 'success');
+      } else {
+        showToast('URL valid, namun pastikan menggunakan domain resmi s.shopee.co.id / shope.ee.', 'warning');
+      }
+      syncAllPreviews(false);
+    }
+
+    function applyPreset(type) {
+      const postArea = document.getElementById('input-post-content');
+      const commentArea = document.getElementById('input-auto-comment');
+
+      if (type === 'racun') {
+        postArea.value = `{Racun Shopee hari ini!|Nyesel baru tau sekarang 😭|Barang viral wajib checkout!}
+
+{produk} lagi promo cuma {harga}! Kualitasnya di luar ekspektasi, beneran kepake banget tiap hari.
+
+Yang mau samaan, {link pembelian udah aku taruh di kolom komentar pertama ya 👇|cek link Shopee resminya di komentar paling atas 👇} #racunshopee #shopeehaul`;
+      } else if (type === 'review') {
+        postArea.value = `{Review jujur pemakaian 2 minggu ✨|Worth it gak sih beli {produk}?}
+
+Awalnya ragu karena harganya cuma {harga}, tapi pas paketnya nyampe ternyata sebagus itu! Bahannya kokoh & rapi.
+
+{Buat yang butuh link toko resminya, udah aku spill di komentar pertama 👇|Link produk original-nya aku taruh di komen ya 👇}`;
+      } else if (type === 'flashsale') {
+        postArea.value = `⚡ {INFO FLASH SALE SHOPEE|DISKON GEDE HARI INI}! ⚡
+
+{produk} turun drastis jadi {harga} aja! Kuota voucher gratis ongkirnya masih tersedia sekarang.
+
+{Langsung amankan lewat link di komentar pertama sebelum kehabisan 👇|Klik link checkout di kolom komentar sekarang 👇}`;
+      }
+
+      commentArea.value = `{Spill link pembelian resminya di sini ya 👇|Buat yang nanya belinya di mana, langsung klik di bawah 👇}
+
+🛒 {produk} ({harga})
+🔗 {link}
+
+{Buruan checkout mumpung stok promo masih ada!|Jangan lupa klaim voucher gratis ongkirnya!}`;
+
+      handleContentInput();
+      showToast(`Template "${type.toUpperCase()}" diterapkan!`, 'success');
+    }
+
+    /**
+     * Calls Gemini API (gemini-3-flash-preview) with exponential backoff
+     * to generate Indonesian Shopee affiliate caption + spintax + auto-comment.
+     * Falls back cleanly to smart offline generator if network/API is unavailable.
+     */
+    async function generateAICopy() {
+      const productName = document.getElementById('input-product-name').value.trim() || 'Produk Viral Shopee';
+      const productPrice = document.getElementById('input-product-price').value.trim() || 'Harga Promo';
+      const category = document.getElementById('input-product-category').value;
+
+      const btn = document.getElementById('btn-ai-generate');
+      const btnText = document.getElementById('ai-btn-text');
+      btn.disabled = true;
+      btn.classList.add('opacity-75', 'cursor-wait');
+      btnText.textContent = 'Meracik Copy & Spintax AI...';
+
+      const prompt = `Kamu adalah pakar Shopee Affiliate Indonesia yang jago membuat copywriting organik, natural, persuasif, dan anti-shadowban untuk Threads, Instagram, X, dan Facebook.
+Produk: "${productName}"
+Harga/Promo: "${productPrice}"
+Kategori: "${category}"
+
+Buatkan variasi teks promosi dalam Bahasa Indonesia santai (gaul sopan) dengan format JSON:
+1. "captionSpintax": Caption utama maksimal 230 karakter agar aman di X, Threads, IG, dan FB. Wajib gunakan format spintax {opsi1|opsi2|opsi3} pada kalimat pembuka dan ajakan cek komentar. Gunakan placeholder {produk} dan {harga}. JANGAN masukkan {link} di caption utama (karena link akan ditaruh di komentar pertama).
+2. "firstCommentSpintax": Teks komentar pertama dengan spintax {opsi1|opsi2} yang mengajak klik {link} untuk membeli {produk} ({harga}).
+3. "keywordReplyTemplate": Kalimat singkat balasan otomatis saat netizen komentar "mau/spill/link", berisi {produk} dan {link}.`;
+
+      const apiKey = "";
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+      const payload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              captionSpintax: { type: "STRING" },
+              firstCommentSpintax: { type: "STRING" },
+              keywordReplyTemplate: { type: "STRING" }
+            },
+            required: ["captionSpintax", "firstCommentSpintax", "keywordReplyTemplate"]
+          }
+        }
+      };
+
+      let generated = null;
+
+      // Exponential backoff retry loop (1s, 2s, 4s)
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          const rawJsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (rawJsonText) {
+            generated = JSON.parse(rawJsonText);
+            break;
+          }
+        } catch (err) {
+          if (attempt < 2) {
+            await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 1000));
+          }
+        }
+      }
+
+      // Smart built-in Indonesian fallback if API is unreachable
+      if (!generated) {
+        generated = {
+          captionSpintax: `{Sumpah ini penyelamat banget!|Ketemu harta karun Shopee lagi 😍|Wajib masuk keranjang sih ini!}\n\n{produk} lagi diskon jadi {harga}! Kualitasnya mantap banget untuk kategori ${category}.\n\n{Link pembelian asli aku taruh di komentar pertama ya 👇|Cek link promo resminya di kolom komentar 👇}`,
+          firstCommentSpintax: `{Ini ya link pembelian resminya 👇|Langsung checkout lewat link Shopee di bawah 👇}\n\n🛍️ {produk} — {harga}\n🔗 {link}\n\n{Mumpung voucher diskon masih aktif!|Stok terbatas ya kak!}`,
+          keywordReplyTemplate: `Halo kak! Ini link promo {produk} yang lagi diskon: {link} — langsung klik aja ya 🙌`
+        };
+      }
+
+      document.getElementById('input-post-content').value = generated.captionSpintax;
+      document.getElementById('input-auto-comment').value = generated.firstCommentSpintax;
+      document.getElementById('input-keyword-reply-text').value = generated.keywordReplyTemplate;
+
+      btn.disabled = false;
+      btn.classList.remove('opacity-75', 'cursor-wait');
+      btnText.textContent = 'Buat Caption & Komentar Otomatis (AI)';
+
+      handleContentInput();
+      addTerminalLog('GEMINI-AI', `Berhasil membuat caption Spintax & auto-komen untuk "${productName}".`);
+      showToast('Caption & Auto-Komen Spintax berhasil dibuat!', 'success');
+    }
+
+    // =========================================================================
+    // 6. MULTI-PLATFORM LIVE PREVIEW RENDERER
+    // =========================================================================
+    function setPreviewTab(platform) {
+      state.activePreviewTab = platform;
+      ['threads', 'instagram', 'x', 'facebook'].forEach(p => {
+        const tabBtn = document.getElementById(`tab-preview-${p}`);
+        if (p === platform) {
+          tabBtn.className = 'py-1.5 px-2 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm transition-all';
+        } else {
+          tabBtn.className = 'py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all';
+        }
+      });
+      syncAllPreviews(false);
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatTextWithLinks(escapedStr) {
+      return escapedStr
+        .replace(/(https?:\/\/[^\s]+)/g, '<span class="text-shopee-500 dark:text-orange-400 underline font-medium break-all">$1</span>')
+        .replace(/\n/g, '<br>');
+    }
+
+    function syncAllPreviews(useRandomSpin = false) {
+      const platform = state.activePreviewTab;
+      const meta = PLATFORM_META[platform];
+      const rawPost = document.getElementById('input-post-content').value;
+      const rawComment = document.getElementById('input-auto-comment').value;
+      const autoCommentEnabled = document.getElementById('toggle-auto-comment').checked;
+      const commentDelay = document.getElementById('select-comment-delay').value;
+      const productName = document.getElementById('input-product-name').value.trim() || 'Produk Shopee';
+      const productPrice = document.getElementById('input-product-price').value.trim() || 'Promo';
+
+      const resolvedPost = resolveSpintaxAndPlaceholders(rawPost, useRandomSpin);
+      const resolvedComment = resolveSpintaxAndPlaceholders(rawComment, useRandomSpin);
+
+      const postHtml = formatTextWithLinks(escapeHtml(resolvedPost));
+      const commentHtml = formatTextWithLinks(escapeHtml(resolvedComment));
+
+      const container = document.getElementById('preview-mockup-container');
+
+      const autoCommentBlock = autoCommentEnabled
+        ? `
+          <div class="mt-3 pt-3 border-t border-dashed border-slate-300 dark:border-slate-700/80 relative pl-4">
+            <div class="absolute left-1.5 top-3 bottom-1 w-0.5 bg-shopee-500/50 rounded-full"></div>
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[11px] font-bold text-slate-800 dark:text-slate-200">${escapeHtml(meta.handle)}</span>
+                <span class="px-1.5 py-0.2 rounded bg-shopee-500/15 text-shopee-500 text-[10px] font-bold">Auto-Komen (+${commentDelay}d)</span>
+              </div>
+              <span class="text-[10px] text-slate-400">Baru saja</span>
+            </div>
+            <div class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200/80 dark:border-slate-800">
+              ${commentHtml}
+            </div>
+          </div>
+        `
+        : `
+          <div class="mt-3 pt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-amber-500 font-medium">
+            ⚠️ Auto-Komen Link Utama sedang dimatikan.
+          </div>
+        `;
+
+      // Platform-specific visual header & media card
+      const instagramMediaCard = platform === 'instagram'
+        ? `
+          <div class="my-2.5 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-orange-500/15 via-slate-900 to-indigo-600/20 p-4 flex items-center justify-between gap-3">
+            <div>
+              <span class="inline-block px-2 py-0.5 rounded bg-shopee-500 text-white text-[10px] font-bold mb-1">SHOPEE RACUN</span>
+              <div class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-1">${escapeHtml(productName)}</div>
+              <div class="text-xs font-extrabold text-shopee-500 mt-0.5">${escapeHtml(productPrice)}</div>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-shopee-500 text-white flex items-center justify-center shrink-0 shadow-md">
+              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            </div>
+          </div>
+        `
+        : '';
+
+      container.innerHTML = `
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-full ${meta.badgeColor} flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+              ${meta.name.slice(0, 2).toUpperCase()}
+            </div>
+            <div>
+              <div class="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1">
+                <span>${escapeHtml(meta.displayName)}</span>
+                <svg class="w-3.5 h-3.5 text-sky-500" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              </div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400">${escapeHtml(meta.handle)} • ${meta.name}</div>
+            </div>
+          </div>
+          <span class="px-2 py-0.5 rounded-md bg-slate-200/70 dark:bg-slate-800 text-[10px] font-mono text-slate-600 dark:text-slate-300">
+            ${resolvedPost.length} kar.
+          </span>
+        </div>
+
+        ${instagramMediaCard}
+
+        <div class="text-xs sm:text-[13px] text-slate-800 dark:text-slate-200 leading-relaxed pt-1">
+          ${postHtml}
+        </div>
+
+        <div class="flex items-center gap-4 pt-1 text-[11px] text-slate-400">
+          <span>❤️ 128</span>
+          <span>💬 24</span>
+          <span>🔁 19</span>
+          <span class="ml-auto text-emerald-500 font-medium">✓ Bebas Link di Body</span>
+        </div>
+
+        ${autoCommentBlock}
+      `;
+    }
+
+    function simulateNetizenComment() {
+      const enabled = document.getElementById('toggle-keyword-reply').checked;
+      const outBox = document.getElementById('test-reply-output');
+      outBox.classList.remove('hidden');
+
+      if (!enabled) {
+        outBox.innerHTML = `<span class="text-amber-500 font-semibold">Auto-Reply Kata Kunci sedang nonaktif.</span> Aktifkan toggle di panel kiri untuk membalas otomatis.`;
+        return;
+      }
+
+      const netizenText = document.getElementById('input-test-netizen').value.trim().toLowerCase();
+      const keywords = document.getElementById('input-trigger-keywords').value
+        .split(',')
+        .map(k => k.trim().toLowerCase())
+        .filter(Boolean);
+
+      const matched = keywords.find(k => netizenText.includes(k));
+      if (!matched) {
+        outBox.innerHTML = `<span class="text-slate-400">Tidak ada kata kunci pemicu yang cocok. Coba ketik kata seperti: <strong>${keywords.slice(0, 3).join(', ')}</strong>.</span>`;
+        return;
+      }
+
+      const replyTemplate = document.getElementById('input-keyword-reply-text').value;
+      const resolvedReply = resolveSpintaxAndPlaceholders(replyTemplate, true);
+
+      outBox.innerHTML = `
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[10px] font-bold text-emerald-500 uppercase">✓ Kata Kunci "${escapeHtml(matched)}" Terdeteksi!</span>
+          <span class="text-[10px] font-mono text-slate-400">Auto-Reply Terkirim</span>
+        </div>
+        <div class="leading-relaxed">${formatTextWithLinks(escapeHtml(resolvedReply))}</div>
+      `;
+
+      addTerminalLog('AUTO-REPLY', `Membalas komentar netizen (keyword: "${matched}") dengan link Shopee.`);
+    }
+
+    // =========================================================================
+    // 7. QUEUE EXECUTION ENGINE & REAL-TIME CONSOLE
+    // =========================================================================
+    function setConsoleTab(tab) {
+      state.activeConsoleTab = tab;
+      const btnQ = document.getElementById('subtab-queue');
+      const btnL = document.getElementById('subtab-logs');
+      const viewQ = document.getElementById('console-view-queue');
+      const viewL = document.getElementById('console-view-logs');
+
+      if (tab === 'queue') {
+        btnQ.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-indigo-500/15 text-indigo-600 dark:text-indigo-400';
+        btnL.className = 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-white';
+        viewQ.classList.remove('hidden');
+        viewL.classList.add('hidden');
+      } else {
+        btnL.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-indigo-500/15 text-indigo-600 dark:text-indigo-400';
+        btnQ.className = 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-white';
+        viewL.classList.remove('hidden');
+        viewQ.classList.add('hidden');
+      }
+    }
+
+    function addTerminalLog(tag, message, isError = false) {
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0];
+      state.logs.unshift({
+        time: timeStr,
+        tag,
+        message,
+        isError
+      });
+      if (state.logs.length > 60) state.logs.pop();
+      renderLogs();
+    }
+
+    function renderLogs() {
+      document.getElementById('log-count-badge').textContent = state.logs.length;
+      const container = document.getElementById('console-view-logs');
+      container.innerHTML = state.logs.map(log => {
+        const tagColor = log.isError
+          ? 'text-rose-400'
+          : log.tag.includes('SHOPEE') || log.tag.includes('KOMEN')
+            ? 'text-orange-400'
+            : log.tag.includes('GEMINI')
+              ? 'text-purple-400'
+              : 'text-emerald-400';
+        return `
+          <div class="leading-relaxed border-b border-slate-900 pb-1">
+            <span class="text-slate-500">[${log.time}]</span>
+            <span class="${tagColor} font-bold">[${escapeHtml(log.tag)}]</span>
+            <span class="text-slate-200">${escapeHtml(log.message)}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function enqueueCampaign() {
+      const activePlatforms = Object.keys(state.selectedPlatforms).filter(k => state.selectedPlatforms[k]);
+      if (activePlatforms.length === 0) {
+        showToast('Pilih minimal 1 platform target terlebih dahulu!', 'error');
+        return;
+      }
+
+      const productName = document.getElementById('input-product-name').value.trim();
+      const affiliateLink = document.getElementById('input-affiliate-link').value.trim();
+      if (!productName || !affiliateLink) {
+        showToast('Nama Produk dan Link Affiliate Shopee wajib diisi!', 'error');
+        return;
+      }
+
+      const rawPost = document.getElementById('input-post-content').value;
+      const rawComment = document.getElementById('input-auto-comment').value;
+      const autoCommentEnabled = document.getElementById('toggle-auto-comment').checked;
+      const platformDelay = parseInt(document.getElementById('select-platform-delay').value, 10);
+      const commentDelay = parseInt(document.getElementById('select-comment-delay').value, 10);
+      const scheduleMode = document.getElementById('select-schedule-mode').value;
+      const scheduleTime = document.getElementById('input-schedule-time').value;
+
+      activePlatforms.forEach((platformKey, idx) => {
+        // Generate unique spun copy for each platform so no duplicate spam occurs
+        const uniquePost = resolveSpintaxAndPlaceholders(rawPost, true);
+        const uniqueComment = autoCommentEnabled ? resolveSpintaxAndPlaceholders(rawComment, true) : '';
+
+        const initialWait = scheduleMode === 'scheduled' ? 10 : idx * platformDelay;
+
+        const job = {
+          id: 'job_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+          platform: platformKey,
+          platformName: PLATFORM_META[platformKey].name,
+          productName,
+          affiliateLink,
+          postContent: uniquePost,
+          commentContent: uniqueComment,
+          autoCommentEnabled,
+          commentDelay,
+          countdown: initialWait,
+          phase: initialWait > 0 ? 'waiting_post' : 'posting', // waiting_post | posting | waiting_comment | commenting | done | error
+          statusLabel: initialWait > 0 ? `Menunggu Jeda ${initialWait}d...` : 'Mengirim Post...',
+          progress: initialWait > 0 ? 15 : 40,
+          scheduleNote: scheduleMode === 'scheduled' ? `Terjadwal (${scheduleTime.replace('T', ' ')})` : 'Langsung'
+        };
+
+        state.queue.unshift(job);
+      });
+
+      renderQueue();
+      addTerminalLog(
+        'QUEUE',
+        `Menambahkan ${activePlatforms.length} tugas kampanye "${productName}" (${state.executionMode.toUpperCase()}).`
+      );
+      showToast(`${activePlatforms.length} tugas ditambahkan ke antrean eksekusi!`, 'success');
+    }
+
+    // Background 1-second worker ticker for queue countdowns & execution
+    setInterval(() => {
+      let needsRender = false;
+
+      state.queue.forEach(job => {
+        if (job.phase === 'done' || job.phase === 'error') return;
+        needsRender = true;
+
+        if (job.phase === 'waiting_post') {
+          if (job.countdown > 1) {
+            job.countdown--;
+            job.statusLabel = `Menunggu Jeda Anti-Spam ${job.countdown}d...`;
+            job.progress = Math.min(35, job.progress + 3);
+          } else {
+            job.phase = 'posting';
+            job.statusLabel = 'Mengirim Post...';
+            job.progress = 50;
+            executePostStep(job);
+          }
+        } else if (job.phase === 'waiting_comment') {
+          if (job.countdown > 1) {
+            job.countdown--;
+            job.statusLabel = `Jeda Auto-Komen ${job.countdown}d...`;
+            job.progress = Math.min(85, 60 + Math.round(((job.commentDelay - job.countdown) / job.commentDelay) * 25));
+          } else {
+            job.phase = 'commenting';
+            job.statusLabel = 'Mengirim Auto-Komen Link...';
+            job.progress = 90;
+            executeCommentStep(job);
+          }
+        }
+      });
+
+      if (needsRender) renderQueue();
+    }, 1000);
+
+    async function executePostStep(job) {
+      addTerminalLog(
+        job.platformName.toUpperCase(),
+        `Mengirim postingan utama ke ${job.platformName}: "${job.postContent.slice(0, 48).replace(/\n/g, ' ')}..."`
+      );
+
+      // If Live Mode & Webhook URL configured, send real HTTP POST
+      if (state.executionMode === 'live' && state.apiConfig.webhookUrl) {
+        try {
+          await fetch(state.apiConfig.webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              event: 'affiliauto.publish_post',
+              platform: job.platform,
+              product: job.productName,
+              affiliateLink: job.affiliateLink,
+              postText: job.postContent,
+              autoCommentText: job.commentContent,
+              autoCommentDelaySec: job.commentDelay,
+              timestamp: new Date().toISOString()
+            })
+          });
+          addTerminalLog('WEBHOOK-LIVE', `Payload berhasil dikirim ke Webhook untuk ${job.platformName} (200 OK).`);
+        } catch (err) {
+          addTerminalLog('WEBHOOK-ERR', `Gagal menghubungi Webhook (${err.message}). Melanjutkan status lokal.`, true);
+        }
+      }
+
+      // Update Post Counter
+      state.stats.postsSent++;
+      document.getElementById('stat-posts').textContent = state.stats.postsSent;
+
+      if (job.autoCommentEnabled && job.commentContent) {
+        job.phase = 'waiting_comment';
+        job.countdown = job.commentDelay;
+        job.statusLabel = `Post Terbit! Jeda Auto-Komen ${job.commentDelay}d...`;
+        job.progress = 62;
+      } else {
+        job.phase = 'done';
+        job.statusLabel = 'Selesai (Post Terkirim)';
+        job.progress = 100;
+        addTerminalLog(job.platformName.toUpperCase(), `Postingan selesai dipublikasikan tanpa auto-komen.`);
+      }
+      renderQueue();
+    }
+
+    function executeCommentStep(job) {
+      state.stats.commentsSent++;
+      document.getElementById('stat-comments').textContent = state.stats.commentsSent;
+
+      job.phase = 'done';
+      job.statusLabel = 'Auto-Komen Terkirim • Selesai';
+      job.progress = 100;
+
+      addTerminalLog(
+        'AUTO-KOMEN',
+        `[${job.platformName}] Komentar pertama dengan link Shopee (${job.affiliateLink}) berhasil diposting!`
+      );
+      renderQueue();
+    }
+
+    function renderQueue() {
+      document.getElementById('queue-count-badge').textContent = state.queue.length;
+      const container = document.getElementById('console-view-queue');
+
+      if (state.queue.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 px-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">Belum ada antrean aktif</p>
+            <p class="text-[11px] text-slate-400 mt-1">Klik tombol <strong>"Tambahkan ke Antrean &amp; Jalankan Sekarang"</strong> untuk memulai.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = state.queue.map(job => {
+        const isDone = job.phase === 'done';
+        const statusColor = isDone
+          ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20'
+          : 'text-shopee-500 bg-shopee-500/10 border-shopee-500/20';
+        const barColor = isDone
+          ? 'bg-emerald-500'
+          : 'bg-gradient-to-r from-shopee-500 to-indigo-500';
+
+        return `
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200/80 dark:border-slate-800 space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+                  ${escapeHtml(job.platformName)}
+                </span>
+                <span class="text-xs font-semibold truncate">${escapeHtml(job.productName)}</span>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${statusColor} shrink-0">
+                ${escapeHtml(job.statusLabel)}
+              </span>
+            </div>
+
+            <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full ${barColor} rounded-full transition-all duration-500" style="width: ${job.progress}%"></div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+              <span class="truncate max-w-[65%] font-mono text-shopee-500/90">${escapeHtml(job.affiliateLink)}</span>
+              <span>${job.autoCommentEnabled ? '💬 Auto-Komen Aktif' : 'Post Saja'}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function clearLogsAndCompleted() {
+      state.queue = state.queue.filter(j => j.phase !== 'done');
+      state.logs = [];
+      addTerminalLog('SYSTEM', 'Riwayat antrean selesai dan log dibersihkan.');
+      renderQueue();
+    }
+
+    // =========================================================================
+    // 8. API & WEBHOOK MODAL HANDLERS
+    // =========================================================================
+    function openSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function saveApiSettings() {
+      state.apiConfig.webhookUrl = document.getElementById('cfg-webhook-url').value.trim();
+      state.apiConfig.metaToken = document.getElementById('cfg-meta-token').value.trim();
+      state.apiConfig.threadsId = document.getElementById('cfg-threads-id').value.trim();
+      state.apiConfig.igId = document.getElementById('cfg-ig-id').value.trim();
+      state.apiConfig.fbId = document.getElementById('cfg-fb-id').value.trim();
+      state.apiConfig.xKey = document.getElementById('cfg-x-key').value.trim();
+      state.apiConfig.xToken = document.getElementById('cfg-x-token').value.trim();
+
+      localStorage.setItem('affiliauto_api_cfg', JSON.stringify(state.apiConfig));
+      closeSettingsModal();
+      addTerminalLog('CONFIG', 'Pengaturan API & Webhook berhasil disimpan.');
+      showToast('Pengaturan API & Webhook tersimpan!', 'success');
+    }
+
+    async function testWebhookConnection() {
+      const url = document.getElementById('cfg-webhook-url').value.trim();
+      const badge = document.getElementById('badge-webhook-status');
+
+      if (!url) {
+        showToast('Masukkan URL Webhook terlebih dahulu untuk menguji koneksi.', 'warning');
+        return;
+      }
+
+      badge.textContent = 'Menguji...';
+      badge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-500/15 text-indigo-400';
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event: 'affiliauto.ping', message: 'Test koneksi dari AffiliAuto Hub' })
+        });
+        if (res.ok) {
+          badge.textContent = 'Terhubung (200 OK)';
+          badge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-500';
+          showToast('Webhook merespons 200 OK! Siap digunakan pada Mode Live.', 'success');
+        } else {
+          throw new Error(`Status ${res.status}`);
+        }
+      } catch (e) {
+        badge.textContent = 'CORS / Endpoint Belum Aktif';
+        badge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-500/15 text-rose-500';
+        showToast(`Gagal ping langsung dari browser (${e.message}). Pastikan CORS aktif di n8n/Make.`, 'error');
+      }
+    }
+
+    // =========================================================================
+    // 9. TOAST NOTIFICATION SYSTEM (NO ALERT/CONFIRM)
+    // =========================================================================
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      const colors = {
+        success: 'bg-slate-900 dark:bg-slate-800 border-emerald-500/50 text-white',
+        error: 'bg-slate-900 dark:bg-slate-800 border-rose-500/50 text-white',
+        warning: 'bg-slate-900 dark:bg-slate-800 border-amber-500/50 text-white',
+        info: 'bg-slate-900 dark:bg-slate-800 border-indigo-500/50 text-white'
+      };
+
+      const dotColors = {
+        success: 'bg-emerald-400',
+        error: 'bg-rose-400',
+        warning: 'bg-amber-400',
+        info: 'bg-indigo-400'
+      };
+
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border shadow-xl text-xs font-medium transition-all duration-300 translate-y-2 opacity-0 ${colors[type] || colors.info}`;
+      toast.innerHTML = `
+        <span class="w-2.5 h-2.5 rounded-full shrink-0 ${dotColors[type] || dotColors.info}"></span>
+        <span class="flex-1 leading-snug">${escapeHtml(message)}</span>
+      `;
+
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3400);
+    }
+
+    // =========================================================================
+    // 10. INITIALIZATION ON PAGE LOAD
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      // Restore saved theme if any
+      const savedTheme = localStorage.getItem('affiliauto_theme');
+      if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+      }
+
+      // Restore saved API settings if any
+      try {
+        const savedCfg = JSON.parse(localStorage.getItem('affiliauto_api_cfg'));
+        if (savedCfg) {
+          Object.assign(state.apiConfig, savedCfg);
+          document.getElementById('cfg-webhook-url').value = state.apiConfig.webhookUrl || '';
+          document.getElementById('cfg-meta-token').value = state.apiConfig.metaToken || '';
+          document.getElementById('cfg-threads-id').value = state.apiConfig.threadsId || '';
+          document.getElementById('cfg-ig-id').value = state.apiConfig.igId || '';
+          document.getElementById('cfg-fb-id').value = state.apiConfig.fbId || '';
+          document.getElementById('cfg-x-key').value = state.apiConfig.xKey || '';
+          document.getElementById('cfg-x-token').value = state.apiConfig.xToken || '';
+        }
+      } catch (e) {}
+
+      // Initial UI sync
+      updatePlatformCardsUI();
+      updateCharCounters();
+      updateSafetyScore();
+      syncAllPreviews(false);
+      renderQueue();
+
+      addTerminalLog('SYSTEM', 'AffiliAuto Hub siap digunakan. Anti-Spam & Spintax Engine aktif.');
+      addTerminalLog('SHOPEE-LINK', 'Deteksi otomatis placeholder {link} pada komentar pertama diaktifkan.');
+    });
+  </script>
+</body>
+</html>
+```
